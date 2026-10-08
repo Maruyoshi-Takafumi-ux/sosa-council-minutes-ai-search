@@ -1,0 +1,14 @@
+[Unit]
+Description=議事録AI検索くん (sosa)
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/opt/sosa-council-minutes-ai-search
+ExecStart=/opt/sosa-council-minutes-ai-search/venv/bin/uvicorn api:app --host 127.0.0.1 --port 8002
+Restart=always
+RestartSec=5
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
