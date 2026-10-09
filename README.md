@@ -37,4 +37,4 @@ uvicorn api:app --host 0.0.0.0 --port 8002
 ## 注意
 - Playwright の既定UA（HeadlessChrome）だとサイト側が sorry ページへ転送し本文が空になる。`collect_all_years.py` は通常ブラウザUAを設定済み。独自スクリプトでも必ずUAを設定すること。
 - 役職の語彙にない部署名は `src/parser.py` の `_DEPT_WORDS` に追加。
-- 運営: 丸吉孝文 (@health-gear)
+- 運営: 近藤魁人（匝瑳市議会議員） https://kitekondo.net/
