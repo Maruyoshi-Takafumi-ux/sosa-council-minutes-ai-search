@@ -176,6 +176,22 @@ def parse_transcript(raw_text: str) -> list[dict]:
     return speeches
 
 
+def compute_minute_nos(raw_text: str) -> list[int]:
+    """○◆◎ の発言ごとに、会議録検索システム上のブロック番号（minute_id）を、出現順に返す。
+
+    会議録ページは「先頭の見出しブロック」＋「△○◆◎で始まる各ブロック」が1行ずつ並ぶ。
+    minute_id は、その行を上から数えた番号（1始まり）。先頭ブロックが1、k番目（0始まり）のマーカー行は k+2。
+    """
+    nos = []
+    k = 0
+    for line in raw_text.splitlines():
+        if line and line[0] in "△○◆◎":
+            if line[0] in "○◆◎":
+                nos.append(k + 2)
+            k += 1
+    return nos
+
+
 def pair_qa(speeches: list[dict]) -> list[tuple[dict, Optional[dict]]]:
     """
     議員の質問と直後の市側答弁をペアリングする

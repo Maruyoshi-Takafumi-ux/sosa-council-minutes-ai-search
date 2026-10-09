@@ -15,6 +15,24 @@ TENANT_ID = 212
 TOP_URL = f"{BASE_URL}/tenant/{TENANT}/SpTop.html"
 MINUTE_VIEW_URL = f"{BASE_URL}/tenant/{TENANT}/SpMinuteView.html"
 
+
+# 会議録（出典）リンクを表示する発言者。カンマ区切りで複数指定可。空にすると全員に表示する。
+SOURCE_LINK_SPEAKERS = [n.strip() for n in os.getenv("SOURCE_LINK_SPEAKERS", "近藤魁人").split(",") if n.strip()]
+
+
+def minute_source_url(council_id: int, schedule_id: int, minute_no: int | None,
+                      speaker_name: str = "") -> str | None:
+    """会議録検索システムで、その発言の位置に直接飛ぶURL。
+    minute_no が無い、または SOURCE_LINK_SPEAKERS に含まれない発言者のときは None。
+    minute_id は、会議録ページに並ぶブロック（見出し・議長・議員・答弁者の発言）の上からの通し番号。"""
+    if not minute_no:
+        return None
+    if SOURCE_LINK_SPEAKERS and speaker_name not in SOURCE_LINK_SPEAKERS:
+        return None
+    return (f"{MINUTE_VIEW_URL}?council_id={council_id}&schedule_id={schedule_id}"
+            f"&minute_id={minute_no}&is_search=true")
+
+
 # --- 収集対象年度 ---
 # 匝瑳市は平成22年(2010)以前から公開されている（確認済み: 平成22年〜）。収集開始年は START_YEAR で調整する。
 # 新年度が公開されたら LATEST_YEAR を更新するだけでよい（他ファイルは全てここを参照）。

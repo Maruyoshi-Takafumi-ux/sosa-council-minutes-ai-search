@@ -55,6 +55,7 @@ def init_db():
             speaker_role TEXT,               -- 役職（議長・議員・市長・部長 等）
             speaker_type TEXT NOT NULL,      -- 'chair'/'member'/'official'
             content      TEXT NOT NULL,      -- 発言内容
+            minute_no    INTEGER,            -- 会議録検索システム上のブロック番号（原文リンク用）
             FOREIGN KEY (minute_id) REFERENCES minutes(id)
         );
 
@@ -99,6 +100,41 @@ def init_db():
         END;
         """)
     print(f"[DB] 初期化完了: {DB_PATH}")
+    _migrate_minute_no()
+
+
+def _migrate_minute_no():
+    """既存DBに minute_no 列が無ければ追加し、既存の発言に番号を付ける（再起動時に自動実行）"""
+    with get_conn() as conn:
+        cols = [r["name"] for r in conn.execute("PRAGMA table_info(speeches)")]
+        if "minute_no" not in cols:
+            conn.execute("ALTER TABLE speeches ADD COLUMN minute_no INTEGER")
+        pending = conn.execute("SELECT COUNT(*) FROM speeches WHERE minute_no IS NULL").fetchone()[0]
+    if pending:
+        done, skipped = backfill_minute_nos()
+        print(f"[DB] 会議録リンク用の番号を付与: {done} 会議録 / スキップ {skipped}")
+
+
+def backfill_minute_nos() -> tuple[int, int]:
+    """minute_no が未設定の発言に、会議録のテキストから計算した番号を付ける。
+    ○◆◎の数と発言数が一致しない会議録は、ずれを避けるためスキップする。"""
+    from .parser import compute_minute_nos
+    done = skipped = 0
+    with get_conn() as conn:
+        minutes = conn.execute("""
+            SELECT m.id, m.raw_text FROM minutes m
+            WHERE EXISTS (SELECT 1 FROM speeches s WHERE s.minute_id = m.id AND s.minute_no IS NULL)
+        """).fetchall()
+        for m in minutes:
+            nos = compute_minute_nos(m["raw_text"])
+            ids = [r["id"] for r in conn.execute(
+                "SELECT id FROM speeches WHERE minute_id=? ORDER BY order_num", (m["id"],))]
+            if len(nos) != len(ids):
+                skipped += 1
+                continue
+            conn.executemany("UPDATE speeches SET minute_no=? WHERE id=?", list(zip(nos, ids)))
+            done += 1
+    return done, skipped
 
 
 @contextmanager
@@ -202,9 +238,9 @@ def insert_speeches(minute_id: int, speeches: list[dict]):
     with get_conn() as conn:
         conn.executemany("""
             INSERT INTO speeches
-                (minute_id, order_num, page_num, speaker_name, speaker_role, speaker_type, content)
-            VALUES (:minute_id, :order_num, :page_num, :speaker_name, :speaker_role, :speaker_type, :content)
-        """, [{"minute_id": minute_id, **s} for s in speeches])
+                (minute_id, order_num, page_num, speaker_name, speaker_role, speaker_type, content, minute_no)
+            VALUES (:minute_id, :order_num, :page_num, :speaker_name, :speaker_role, :speaker_type, :content, :minute_no)
+        """, [{"minute_id": minute_id, "minute_no": None, **s} for s in speeches])
 
 
 def get_speech_by_id(speech_id: int) -> dict | None:

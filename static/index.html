@@ -290,6 +290,15 @@
       cursor: pointer;
       transition: all 0.2s;
     }
+    .btn-source {
+      display: inline-block;
+      color: #3a6ea5;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      padding: 8px 4px;
+    }
+    .btn-source:hover { text-decoration: underline; }
     .btn-fulltext:hover {
       background: #f0f4f8;
       border-color: #8a9aaa;
@@ -652,6 +661,7 @@
           <div class="card-excerpt">${highlight(r.content_excerpt, currentQuery)}…</div>
           <div class="card-footer">
             <button class="btn-fulltext" id="btnft-${r.id}" onclick="loadFullText(${r.id})">原文を見る</button>
+            ${r.source_url ? `<a class="btn-source" href="${escHtml(r.source_url)}" target="_blank" rel="noopener">会議録（出典）で見る ↗</a>` : ''}
             <button class="btn-summary" id="btn-${r.id}" onclick="loadSummary(${r.id})">
               ${r.has_summary ? '✓ AI要約を見る' : 'AI要約を見る'}
             </button>
@@ -714,6 +724,7 @@
       panel.innerHTML = `
         <div class="fulltext-label">原文（発言全文）</div>
         <div class="fulltext-body">${escHtml(d.content)}</div>
+        ${d.source_url ? `<div style="margin-top:8px"><a class="btn-source" href="${escHtml(d.source_url)}" target="_blank" rel="noopener">会議録検索システムの該当箇所を開く ↗</a></div>` : ''}
       `;
       panel.dataset.loaded = 'true';
       btn.disabled = false;

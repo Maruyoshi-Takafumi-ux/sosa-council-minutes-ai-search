@@ -14,7 +14,7 @@ from google import genai
 from google.genai import types
 from .config import GEMINI_API_KEY, GEMINI_MODEL, GEMINI_MAX_CHARS
 from . import db
-from .parser import parse_transcript
+from .parser import parse_transcript, compute_minute_nos
 
 
 client = genai.Client(api_key=GEMINI_API_KEY)
@@ -213,6 +213,10 @@ def run_parse():
     total = 0
     for minute in unprocessed:
         speeches = parse_transcript(minute["raw_text"])
+        nos = compute_minute_nos(minute["raw_text"])
+        if speeches and len(nos) == len(speeches):   # 数が合うときだけ、原文リンク用の番号を付ける
+            for sp, no in zip(speeches, nos):
+                sp["minute_no"] = no
         if speeches:
             db.insert_speeches(minute["id"], speeches)
             total += len(speeches)
