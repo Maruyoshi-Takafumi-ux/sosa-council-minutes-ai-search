@@ -39,7 +39,7 @@ def minute_source_url(council_id: int, schedule_id: int, minute_no: int | None,
 VIDEO_BASE_URL = "https://smart.discussvision.net/smart/tenant/sosa/WebView/rd/speech.html"
 VIDEO_SPEAKER_ID = 24
 VIDEO_BY_MINUTES = {
-    (117, 5): (69, 6, 1, 2023), (118, 5): (70, 5, 4, 2023), (121, 5): (71, 5, 2, 2023), (123, 5): (73, 5, 3, 2023),
+    (113, 5): (67, 5, 3, 2022), (117, 5): (69, 6, 1, 2023), (118, 5): (70, 5, 4, 2023), (121, 5): (71, 5, 2, 2023), (123, 5): (73, 5, 3, 2023),
     (125, 5): (74, 6, 2, 2024), (127, 5): (75, 5, 3, 2024), (129, 5): (76, 6, 2, 2024), (131, 5): (78, 5, 4, 2024),
     (133, 5): (79, 6, 3, 2025), (135, 4): (80, 4, 5, 2025), (137, 4): (81, 5, 5, 2025), (139, 5): (83, 5, 4, 2025),
     (141, 4): (84, 5, 4, 2026), (143, 4): (85, 4, 4, 2026),
@@ -61,7 +61,7 @@ def video_url(council_id: int, schedule_id: int, speaker_name: str = "") -> str 
 # --- 収集対象年度 ---
 # 匝瑳市は平成22年(2010)以前から公開されている（確認済み: 平成22年〜）。収集開始年は START_YEAR で調整する。
 # 新年度が公開されたら LATEST_YEAR を更新するだけでよい（他ファイルは全てここを参照）。
-START_YEAR = int(os.getenv("START_YEAR", "2023"))   # 令和5年〜（4年分。遡る場合は環境変数で指定）
+START_YEAR = int(os.getenv("START_YEAR", "2022"))   # 令和4年〜（近藤議員の初当選後の令和4年12月定例会から収録。遡る場合は環境変数で指定）
 LATEST_YEAR = int(os.getenv("LATEST_YEAR", "2026"))  # 令和8年
 
 

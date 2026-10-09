@@ -5,7 +5,7 @@
 
 - 会議録元: https://ssp.kaigiroku.net/tenant/sosa/SpTop.html （tenant=`sosa`, tenant_id=`212`）
 - 公開予定: https://sosa.council-minutes-ai-search.jp （VPS上ポート 8002）
-- 収録期間: 令和5年〜令和8年（4年分。公開は平成22年〜）。`START_YEAR`で変更可
+- 収録期間: 令和4年12月〜令和8年（近藤議員の初当選後の定例会から。公開は平成22年〜）。`START_YEAR`で変更可
 
 ## 匝瑳市の議事録の特徴
 - 書式は松原市と同じ括弧書き（`○議長（都祭広一君）`）。
