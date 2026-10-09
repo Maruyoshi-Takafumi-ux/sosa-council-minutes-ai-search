@@ -33,6 +33,31 @@ def minute_source_url(council_id: int, schedule_id: int, minute_no: int | None,
             f"&minute_id={minute_no}&is_search=true")
 
 
+# 議会中継（録画）。匝瑳市議会の公式の中継サービスへのリンク（動画の複製はしない）。
+# 会議録の (council_id, schedule_id) → 中継サービスの (council_id, schedule_id, playlist_id, 年)。
+# 一般質問の日（本会議）だけ。SOURCE_LINK_SPEAKERS の発言者にのみ表示する（speaker_id=24 は近藤魁人）。
+VIDEO_BASE_URL = "https://smart.discussvision.net/smart/tenant/sosa/WebView/rd/speech.html"
+VIDEO_SPEAKER_ID = 24
+VIDEO_BY_MINUTES = {
+    (117, 5): (69, 6, 1, 2023), (118, 5): (70, 5, 4, 2023), (121, 5): (71, 5, 2, 2023), (123, 5): (73, 5, 3, 2023),
+    (125, 5): (74, 6, 2, 2024), (127, 5): (75, 5, 3, 2024), (129, 5): (76, 6, 2, 2024), (131, 5): (78, 5, 4, 2024),
+    (133, 5): (79, 6, 3, 2025), (135, 4): (80, 4, 5, 2025), (137, 4): (81, 5, 5, 2025), (139, 5): (83, 5, 4, 2025),
+    (141, 4): (84, 5, 4, 2026), (143, 4): (85, 4, 4, 2026),
+}
+
+
+def video_url(council_id: int, schedule_id: int, speaker_name: str = "") -> str | None:
+    """議会中継の録画ページのURL。対象外の発言者・日付のときは None。"""
+    if SOURCE_LINK_SPEAKERS and speaker_name not in SOURCE_LINK_SPEAKERS:
+        return None
+    v = VIDEO_BY_MINUTES.get((council_id, schedule_id))
+    if not v:
+        return None
+    c, s, p, y = v
+    return (f"{VIDEO_BASE_URL}?council_id={c}&schedule_id={s}&playlist_id={p}"
+            f"&speaker_id={VIDEO_SPEAKER_ID}&target_year={y}&tab_id=1")
+
+
 # --- 収集対象年度 ---
 # 匝瑳市は平成22年(2010)以前から公開されている（確認済み: 平成22年〜）。収集開始年は START_YEAR で調整する。
 # 新年度が公開されたら LATEST_YEAR を更新するだけでよい（他ファイルは全てここを参照）。

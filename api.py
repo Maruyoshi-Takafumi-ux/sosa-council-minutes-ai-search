@@ -18,7 +18,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from src import db
-from src.config import YEAR_ORDER, minute_source_url
+from src.config import YEAR_ORDER, minute_source_url, video_url
 from src.summarizer import suggest_keywords, summarize_one
 
 app = FastAPI(title="匝瑳市議会議事録AI検索")
@@ -80,6 +80,7 @@ def search(
             "content_excerpt": s["content"][:200].replace("\n", " "),
             "council_id": s["council_id"],
             "source_url": minute_source_url(s["council_id"], s["schedule_id"], s.get("minute_no"), s["speaker_name"]),
+            "video_url": video_url(s["council_id"], s["schedule_id"], s["speaker_name"]),
             "has_summary": cached is not None,
         })
 
@@ -109,6 +110,7 @@ def get_speech(speech_id: int):
         "schedule_name": speech["schedule_name"],
         "content": speech["content"],
         "source_url": minute_source_url(speech["council_id"], speech["schedule_id"], speech.get("minute_no"), speech["speaker_name"]),
+        "video_url": video_url(speech["council_id"], speech["schedule_id"], speech["speaker_name"]),
     }
 
 
